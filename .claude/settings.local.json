@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:filestage.io)",
+      "WebSearch",
+      "WebFetch(domain:app.filestage.io)",
+      "WebFetch(domain:help.filestage.io)",
+      "WebFetch(domain:thedigitalprojectmanager.com)",
+      "WebFetch(domain:changelog.filestage.io)",
+      "Bash(cd:*)",
+      "Bash(taskkill:*)",
+      "Bash(curl:*)",
+      "Bash(which railway:*)",
+      "Bash(npx:*)",
+      "Bash(which git:*)",
+      "Bash(vercel:*)",
+      "Bash(npm install:*)",
+      "Bash(flyctl version:*)",
+      "Bash(gh auth:*)",
+      "Bash(git remote:*)",
+      "Bash(git config:*)",
+      "Read(//c/Users/Mikhail/**)"
+    ]
+  }
+}
