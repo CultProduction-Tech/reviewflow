@@ -21,7 +21,18 @@ function saveDb() {
 setInterval(saveDb, 5000);
 
 async function initDb() {
-  const SQL = await initSqlJs();
+  const wasmPaths = [
+    '/tmp/sql-wasm.wasm',
+    path.join(__dirname, '..', 'node_modules', 'sql.js', 'dist', 'sql-wasm.wasm'),
+  ];
+  const SQL = await initSqlJs({
+    locateFile: file => {
+      for (const p of wasmPaths) {
+        if (fs.existsSync(p)) return p;
+      }
+      return file;
+    }
+  });
   if (fs.existsSync(DB_PATH)) {
     const fileBuffer = fs.readFileSync(DB_PATH);
     db = new SQL.Database(fileBuffer);
