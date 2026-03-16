@@ -47,6 +47,20 @@ async function initDb() {
 
 dbReady = initDb();
 
+// Convert Uint8Array values to proper strings (sql.js returns blobs for text)
+function fixRow(obj) {
+  if (!obj) return obj;
+  const result = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (value instanceof Uint8Array) {
+      result[key] = new TextDecoder('utf-8').decode(value);
+    } else {
+      result[key] = value;
+    }
+  }
+  return result;
+}
+
 function getDb() {
   if (!db) throw new Error('Database not initialized yet');
   return {
@@ -57,7 +71,7 @@ function getDb() {
         stmt.bind(params);
         let result = null;
         if (stmt.step()) {
-          result = stmt.getAsObject();
+          result = fixRow(stmt.getAsObject());
         }
         stmt.free();
         return result;
@@ -67,7 +81,7 @@ function getDb() {
         const stmt = db.prepare(sql);
         stmt.bind(params);
         while (stmt.step()) {
-          results.push(stmt.getAsObject());
+          results.push(fixRow(stmt.getAsObject()));
         }
         stmt.free();
         return results;
