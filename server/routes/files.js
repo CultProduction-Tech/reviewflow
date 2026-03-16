@@ -8,7 +8,7 @@ const { authMiddleware } = require('../auth');
 
 const router = Router();
 
-const UPLOAD_DIR = path.join(__dirname, '..', 'uploads');
+const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, '..', 'uploads');
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
 const storage = multer.diskStorage({
