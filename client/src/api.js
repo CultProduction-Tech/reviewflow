@@ -1,6 +1,6 @@
 const BASE = '/api';
 
-async function request(url, options = {}) {
+async function request(url, options = {}, retries = 1) {
   const token = localStorage.getItem('token');
   const headers = { ...options.headers };
   if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -8,14 +8,29 @@ async function request(url, options = {}) {
     headers['Content-Type'] = 'application/json';
   }
 
-  const res = await fetch(`${BASE}${url}`, { ...options, headers, credentials: 'include' });
+  let res;
+  try {
+    res = await fetch(`${BASE}${url}`, { ...options, headers, credentials: 'include' });
+  } catch (err) {
+    if (retries > 0) return request(url, options, retries - 1);
+    throw new Error('Ошибка сети. Попробуйте ещё раз.');
+  }
+
   if (res.status === 401) {
     localStorage.removeItem('token');
     if (!url.includes('/auth/')) window.location.href = '/login';
-    throw new Error('Unauthorized');
+    throw new Error('Требуется авторизация');
   }
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Request failed');
+
+  let data;
+  try {
+    data = await res.json();
+  } catch {
+    if (retries > 0) return request(url, options, retries - 1);
+    throw new Error('Ошибка сервера. Попробуйте ещё раз.');
+  }
+
+  if (!res.ok) throw new Error(data.error || 'Ошибка запроса');
   return data;
 }
 
